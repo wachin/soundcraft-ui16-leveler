@@ -1,4 +1,18 @@
 
 # Audio files
-.wav
-.mp3
+*.wav
+*.mp3
+*.parcial
+
+# Translations (compiled)
+*.qm
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+

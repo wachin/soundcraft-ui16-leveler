@@ -38,6 +38,7 @@ from .analysis import (
     predicted_peak_db,
 )
 from .audiofile import AudioError, AudioFile, Cancelled
+from .profiles import ProfileManager
 
 COL_ORIG = (90, 150, 255, 120)      # blue: original waveform
 COL_CORR = (255, 170, 60, 70)       # orange: planned correction
@@ -121,6 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings = Settings()
         self.worker: Worker | None = None
         self.busy = False
+        self.profiles = ProfileManager()
         self._tempdir = tempfile.mkdtemp(prefix="leveler_")
         self._render_path: str | None = None
         self._render_dirty = True
@@ -299,6 +301,26 @@ class MainWindow(QtWidgets.QMainWindow):
         lay = QtWidgets.QVBoxLayout(panel)
         lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(8)
+ 
+        # --- profiles
+        self.grp_prof = QtWidgets.QGroupBox()
+        lp = QtWidgets.QHBoxLayout(self.grp_prof)
+        self.cmb_prof = QtWidgets.QComboBox()
+        self.cmb_prof.setEditable(True)
+        self.cmb_prof.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
+        self.cmb_prof.currentIndexChanged.connect(self._on_profile_selected)
+        lp.addWidget(self.cmb_prof, 1)
+        
+        self.btn_save_prof = QtWidgets.QPushButton()
+        self.btn_save_prof.setFixedWidth(40)
+        self.btn_save_prof.clicked.connect(self._save_profile)
+        lp.addWidget(self.btn_save_prof)
+        
+        self.btn_del_prof = QtWidgets.QPushButton()
+        self.btn_del_prof.setFixedWidth(40)
+        self.btn_del_prof.clicked.connect(self._delete_profile)
+        lp.addWidget(self.btn_del_prof)
+        lay.addWidget(self.grp_prof)
 
         # --- analysis summary
         self.grp_info = QtWidgets.QGroupBox()
@@ -438,6 +460,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.gplot.setLabel("left", self.tr("dB"), **GAIN_AXIS)
 
         self.lbl_progress.setText(self.tr("Progress"))
+
+        self.grp_prof.setTitle(self.tr("Profiles"))
+        self.btn_save_prof.setToolTip(self.tr("Save current settings to a profile"))
+        self.btn_save_prof.setText("💾")
+        self.btn_del_prof.setToolTip(self.tr("Delete selected profile"))
+        self.btn_del_prof.setText("🗑")
+        self._refresh_profiles()
+
         self.grp_info.setTitle(self.tr("Analysis"))
         self.lbl_ref_title.setText(self.tr("Reference level (music):"))
         self.lbl_target_title.setText(self.tr("Target level (voice):"))
@@ -749,9 +779,77 @@ class MainWindow(QtWidgets.QMainWindow):
         self._set_range(seg.start_s - pad, seg.end_s + pad)
 
     # ------------------------------------------------------------------ parameters
-    def _on_params_changed(self):
-        if self.audio is None:
+    def _refresh_profiles(self):
+        self.cmb_prof.blockSignals(True)
+        current = self.cmb_prof.currentText()
+        self.cmb_prof.clear()
+        self.cmb_prof.addItems(self.profiles.get_profile_names())
+        self.cmb_prof.setCurrentText(current)
+        self.cmb_prof.blockSignals(False)
+
+    def _on_profile_selected(self, _):
+        name = self.cmb_prof.currentText()
+        s = self.profiles.get_settings(name)
+        if s:
+            self.settings = s
+            self._update_spins()
+            self._on_params_changed()
+
+    def _update_spins(self):
+        self.sp_target.blockSignals(True)
+        self.sp_target.setValue(self.settings.target_db)
+        self.sp_target.blockSignals(False)
+
+        self.sp_maxgain.blockSignals(True)
+        self.sp_maxgain.setValue(self.settings.max_gain_db)
+        self.sp_maxgain.blockSignals(False)
+
+        self.sp_slow.blockSignals(True)
+        self.sp_slow.setValue(self.settings.slow_s)
+        self.sp_slow.blockSignals(False)
+
+        self.sp_content.blockSignals(True)
+        self.sp_content.setValue(self.settings.content_floor_db)
+        self.sp_content.blockSignals(False)
+
+        self.sp_ceiling.blockSignals(True)
+        self.sp_ceiling.setValue(self.settings.ceiling_db)
+        self.sp_ceiling.blockSignals(False)
+
+        self.chk_limiter.blockSignals(True)
+        self.chk_limiter.setChecked(self.settings.limiter)
+        self.chk_limiter.blockSignals(False)
+
+        self.chk_att.blockSignals(True)
+        self.chk_att.setChecked(self.settings.allow_attenuate)
+        self.chk_att.blockSignals(False)
+
+        self.sp_att.blockSignals(True)
+        self.sp_att.setValue(self.settings.max_atten_db)
+        self.sp_att.blockSignals(False)
+
+    def _save_profile(self):
+        name = self.cmb_prof.currentText().strip()
+        if not name:
             return
+        self.profiles.save_profile(name, self.settings)
+        self._refresh_profiles()
+        self.cmb_prof.setCurrentText(name)
+        self.status.showMessage(self.tr("Profile saved: %s") % name)
+
+    def _delete_profile(self):
+        name = self.cmb_prof.currentText()
+        if not name or name not in self.profiles.profiles:
+            return
+        res = QtWidgets.QMessageBox.question(
+            self, self.tr("Delete profile"),
+            self.tr("Are you sure you want to delete the profile “%s”?") % name)
+        if res == QtWidgets.QMessageBox.StandardButton.Yes:
+            self.profiles.delete_profile(name)
+            self._refresh_profiles()
+            self.status.showMessage(self.tr("Profile deleted: %s") % name)
+
+    def _on_params_changed(self):
         self.settings.target_db = self.sp_target.value()
         self.settings.max_gain_db = self.sp_maxgain.value()
         self.settings.slow_s = self.sp_slow.value()
@@ -760,7 +858,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings.limiter = self.chk_limiter.isChecked()
         self.settings.allow_attenuate = self.chk_att.isChecked()
         self.settings.max_atten_db = self.sp_att.value()
-        if self.res is not None:
+        if self.audio is not None and self.res is not None:
             self._recompute_gain(keep_segments=False)
             ymax = max(27.0, self.settings.max_gain_db + 2)
             self.gplot.setYRange(-1, ymax, padding=0)
