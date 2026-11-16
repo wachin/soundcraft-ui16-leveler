@@ -136,6 +136,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._select_mode = False
         self._select_region: pg.LinearRegionItem | None = None
         self._select_start: float | None = None
+        self._history: list[tuple[list[Segment], np.ndarray]] = []  # (segments, gain)
+        self._history_index: int = -1
 
         pg.setConfigOptions(antialias=False)
         pg.setConfigOption("background", "#161a20")
@@ -233,6 +235,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar.addAction(self.act_zoom_out)
         self.act_fit = self._make_action(icon_path, "fit.svg", "Fit all", self.fit_view)
         self.toolbar.addAction(self.act_fit)
+
+        # Undo/Redo
+        self.act_undo = self._make_action(icon_path, "undo.svg", self.tr("Undo"), self._undo, "Ctrl+Z")
+        self.toolbar.addAction(self.act_undo)
+        self.act_redo = self._make_action(icon_path, "redo.svg", self.tr("Redo"), self._redo, "Ctrl+Y")
+        self.toolbar.addAction(self.act_redo)
 
         # Selection tool
         self.act_select = self._make_action(icon_path, "select.svg", "Select range", self._toggle_select_mode)
@@ -796,6 +804,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fit_view()
         self._update_enabled()
         self._show_ready_status()
+        # Initialize history with the initial state
+        self._history = []
+        self._history_index = -1
+        self._save_history()
 
     def _show_ready_status(self):
         self.status.showMessage(self.tr(
@@ -959,6 +971,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         seg = self.res.segments[r]
         seg.enabled = self.tbl.item(r, 0).checkState() == Qt.CheckState.Checked
+        self._save_history()
         self._recompute_gain(keep_segments=True)
 
     def _goto_selected_segment(self):
@@ -968,6 +981,59 @@ class MainWindow(QtWidgets.QMainWindow):
         seg = self.res.segments[r]
         pad = max(2.0, 0.15 * seg.duration)
         self._set_range(seg.start_s - pad, seg.end_s + pad)
+
+    # ------------------------------------------------------------------ undo/redo
+    def _save_history(self):
+        """Save current segments and gain state to history."""
+        if self.res is None or self.gain is None:
+            return
+        # Deep copy segments and gain
+        segs_copy = [Segment(
+            i0=s.i0, i1=s.i1, start_s=s.start_s, end_s=s.end_s,
+            level_db=s.level_db, gain_db=s.gain_db,
+            trim_db=s.trim_db, enabled=s.enabled
+        ) for s in self.res.segments]
+        gain_copy = self.gain.copy()
+        # Truncate history after current index
+        self._history = self._history[:self._history_index + 1]
+        self._history.append((segs_copy, gain_copy))
+        self._history_index = len(self._history) - 1
+        # Limit history size
+        if len(self._history) > 50:
+            self._history.pop(0)
+            self._history_index -= 1
+        self._update_undo_redo()
+
+    def _update_undo_redo(self):
+        self.act_undo.setEnabled(self._history_index > 0)
+        self.act_redo.setEnabled(self._history_index < len(self._history) - 1)
+
+    def _undo(self):
+        if self._history_index <= 0 or self.res is None:
+            return
+        self._history_index -= 1
+        self._restore_history()
+
+    def _redo(self):
+        if self._history_index >= len(self._history) - 1 or self.res is None:
+            return
+        self._history_index += 1
+        self._restore_history()
+
+    def _restore_history(self):
+        segs, gain = self._history[self._history_index]
+        self.res.segments = [Segment(
+            i0=s.i0, i1=s.i1, start_s=s.start_s, end_s=s.end_s,
+            level_db=s.level_db, gain_db=s.gain_db,
+            trim_db=s.trim_db, enabled=s.enabled
+        ) for s in segs]
+        self.gain = gain.copy()
+        self._refresh_seg_table()
+        self._render_segment_regions()
+        self._redraw()
+        self._update_undo_redo()
+        msg = self.tr("Undo") if self._history_index < len(self._history) - 1 else self.tr("Redo")
+        self.status.showMessage(msg)
 
     # ------------------------------------------------------------------ manual selection
     def _toggle_select_mode(self, checked: bool):
@@ -1024,6 +1090,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Add to segments list
         self.res.segments.append(seg)
         # Recompute gain with the new segment
+        self._save_history()
         self._recompute_gain(keep_segments=True)
         self._refresh_seg_table()
         self._render_segment_regions()
@@ -1118,6 +1185,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings.allow_attenuate = self.chk_att.isChecked()
         self.settings.max_atten_db = self.sp_att.value()
         if self.audio is not None and self.res is not None:
+            self._save_history()
             self._recompute_gain(keep_segments=False)
             ymax = max(27.0, self.settings.max_gain_db + 2)
             self.gplot.setYRange(-1, ymax, padding=0)
