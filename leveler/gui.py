@@ -203,10 +203,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.act_open = self._make_action(icon_path, "open.svg", "Open…", self.open_file, "Ctrl+O")
         self.toolbar.addAction(self.act_open)
         self.act_prepare = self._make_action(icon_path, "export.svg", "Prepare correction", self.prepare_render)
+        self.toolbar.addAction(self.act_prepare)
         self.toolbar.addSeparator()
 
         self.act_play = self._make_action(icon_path, "play.svg", "Play", self.toggle_play)
+        self.toolbar.addAction(self.act_play)
         self.act_stop = self._make_action(icon_path, "stop.svg", "Stop", self.stop_play)
+        self.toolbar.addAction(self.act_stop)
         self.lbl_listen = QtWidgets.QLabel()
         self.toolbar.addWidget(self.lbl_listen)
         self.cmb_ab = QtWidgets.QComboBox()
@@ -217,10 +220,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar.addSeparator()
 
         self.act_zoom_in = self._make_action(icon_path, "zoom_in.svg", "Zoom in", lambda: self._zoom(0.5))
+        self.toolbar.addAction(self.act_zoom_in)
         self.act_zoom_out = self._make_action(icon_path, "zoom_out.svg", "Zoom out", lambda: self._zoom(2.0))
+        self.toolbar.addAction(self.act_zoom_out)
         self.act_fit = self._make_action(icon_path, "fit.svg", "Fit all", self.fit_view)
+        self.toolbar.addAction(self.act_fit)
         self.toolbar.addSeparator()
         self.act_export = self._make_action(icon_path, "export.svg", "Export WAV…", self.export_file, "Ctrl+E")
+        self.toolbar.addAction(self.act_export)
 
         self.lbl_file = QtWidgets.QLabel()
         self.lbl_file.setStyleSheet("color:#8fa4c8;")
