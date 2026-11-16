@@ -202,6 +202,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lbl_listen = QtWidgets.QLabel()
         self.toolbar.addWidget(self.lbl_listen)
         self.cmb_ab = QtWidgets.QComboBox()
+        self.cmb_ab.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.cmb_ab.installEventFilter(self)
         self.cmb_ab.currentIndexChanged.connect(self._on_ab_changed)
         self.toolbar.addWidget(self.cmb_ab)
         self.toolbar.addSeparator()
@@ -295,27 +297,36 @@ class MainWindow(QtWidgets.QMainWindow):
         plot.getViewBox().seeked.connect(self._seek_to)
         return plot
 
+    def eventFilter(self, obj, ev):
+        if ev.type() == QtCore.QEvent.Type.Wheel:
+            if isinstance(obj, (QtWidgets.QAbstractSpinBox, QtWidgets.QComboBox)):
+                ev.ignore()
+                return True
+        return super().eventFilter(obj, ev)
+
     def _build_side_panel(self):
         panel = QtWidgets.QWidget()
         panel.setMinimumWidth(300)
         lay = QtWidgets.QVBoxLayout(panel)
         lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(8)
- 
+
         # --- profiles
         self.grp_prof = QtWidgets.QGroupBox()
         lp = QtWidgets.QHBoxLayout(self.grp_prof)
         self.cmb_prof = QtWidgets.QComboBox()
+        self.cmb_prof.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.cmb_prof.installEventFilter(self)
         self.cmb_prof.setEditable(True)
         self.cmb_prof.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
         self.cmb_prof.currentIndexChanged.connect(self._on_profile_selected)
         lp.addWidget(self.cmb_prof, 1)
-        
+
         self.btn_save_prof = QtWidgets.QPushButton()
         self.btn_save_prof.setFixedWidth(40)
         self.btn_save_prof.clicked.connect(self._save_profile)
         lp.addWidget(self.btn_save_prof)
-        
+
         self.btn_del_prof = QtWidgets.QPushButton()
         self.btn_del_prof.setFixedWidth(40)
         self.btn_del_prof.clicked.connect(self._delete_profile)
@@ -342,8 +353,18 @@ class MainWindow(QtWidgets.QMainWindow):
         f.addRow(self.lbl_nseg_title, self.lbl_nseg)
         lay.addWidget(self.grp_info)
 
-        # --- parameters
+        # --- Tabs for Parameters and Segments
+        self.tabs = QtWidgets.QTabWidget()
+        lay.addWidget(self.tabs, 1)
+
+        # --- parameters tab
+        self.pane_par = QtWidgets.QWidget()
+        self.tabs.addTab(self.pane_par, "")
+        lp_par = QtWidgets.QVBoxLayout(self.pane_par)
+        lp_par.setContentsMargins(4, 4, 4, 4)
+
         self.grp_par = QtWidgets.QGroupBox()
+        self.grp_par.setFlat(True)
         fp = QtWidgets.QFormLayout(self.grp_par)
 
         def spin(lo, hi, val, step, dec=1, suffix=""):
@@ -352,11 +373,14 @@ class MainWindow(QtWidgets.QMainWindow):
             s.setValue(val)
             s.setSingleStep(step)
             s.setDecimals(dec)
+            s.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+            s.installEventFilter(self)
             if suffix:
                 s.setSuffix(suffix)
             return s
 
         self.sp_target = spin(-30, 12, self.settings.target_db, 0.5, 1, " dB")
+        self.sp_boost = spin(0, 10, self.settings.global_boost_db, 0.5, 1, " dB")
         self.sp_maxgain = spin(0, 48, self.settings.max_gain_db, 1, 1, " dB")
         self.sp_slow = spin(1, 120, self.settings.slow_s, 1, 0, " s")
         self.sp_content = spin(5, 60, self.settings.content_floor_db, 1, 0, " dB")
@@ -376,6 +400,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lbl_target_hint.setStyleSheet("color:#8fa4c8; font-size:9pt;")
 
         self.lbl_target_title2 = QtWidgets.QLabel()
+        self.lbl_boost_title = QtWidgets.QLabel()
         self.lbl_maxgain_title = QtWidgets.QLabel()
         self.lbl_slow_title = QtWidgets.QLabel()
         self.lbl_content_title = QtWidgets.QLabel()
@@ -384,6 +409,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         fp.addRow(self.lbl_target_title2, self.sp_target)
         fp.addRow("", self.lbl_target_hint)
+        fp.addRow(self.lbl_boost_title, self.sp_boost)
         fp.addRow(self.lbl_maxgain_title, self.sp_maxgain)
         fp.addRow(self.lbl_slow_title, self.sp_slow)
         fp.addRow(self.lbl_content_title, self.sp_content)
@@ -391,17 +417,19 @@ class MainWindow(QtWidgets.QMainWindow):
         fp.addRow("", self.chk_limiter)
         fp.addRow("", self.chk_att)
         fp.addRow(self.lbl_att_title, self.sp_att)
-        lay.addWidget(self.grp_par)
+        lp_par.addWidget(self.grp_par)
+        lp_par.addStretch(1)
 
-        # They are connected at the end to avoid triggering the reload while
-        # the interface is still being built
-        for w in (self.sp_target, self.sp_maxgain, self.sp_slow, self.sp_content,
+        for w in (self.sp_target, self.sp_boost, self.sp_maxgain, self.sp_slow, self.sp_content,
                   self.sp_ceiling, self.sp_att):
             w.valueChanged.connect(self._on_params_changed)
 
-        # --- detected segments
-        self.grp_seg = QtWidgets.QGroupBox()
-        ls = QtWidgets.QVBoxLayout(self.grp_seg)
+        # --- detected segments tab
+        self.pane_seg = QtWidgets.QWidget()
+        self.tabs.addTab(self.pane_seg, "")
+        ls = QtWidgets.QVBoxLayout(self.pane_seg)
+        ls.setContentsMargins(4, 4, 4, 4)
+
         self.tbl = QtWidgets.QTableWidget(0, 4)
         self.tbl.verticalHeader().setVisible(False)
         self.tbl.horizontalHeader().setStretchLastSection(True)
@@ -412,7 +440,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_goto = QtWidgets.QPushButton()
         self.btn_goto.clicked.connect(self._goto_selected_segment)
         ls.addWidget(self.btn_goto)
-        lay.addWidget(self.grp_seg, 1)
 
         return panel
 
@@ -475,8 +502,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lbl_peak_title.setText(self.tr("Predicted peak after correction:"))
         self.lbl_nseg_title.setText(self.tr("Segments with low volume:"))
 
-        self.grp_par.setTitle(self.tr("Correction parameters"))
+        self.tabs.setTabText(0, self.tr("Correction parameters"))
+        self.tabs.setTabText(1, self.tr("Detected segments"))
+
+        self.grp_par.setTitle("")
         self.lbl_target_title2.setText(self.tr("Target level (voice):"))
+        self.lbl_boost_title.setText(self.tr("Global boost:"))
         self.lbl_target_hint.setText(self.tr(
             "Level the voice is taken to, in dB relative to the music: "
             "0 dB = same as the music, negative = quieter, positive = louder."))
@@ -488,7 +519,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.chk_att.setText(self.tr("Allow lowering volume"))
         self.lbl_att_title.setText(self.tr("Maximum attenuation:"))
 
-        self.grp_seg.setTitle(self.tr("Detected segments"))
         self.tbl.setHorizontalHeaderLabels(
             [self.tr("Apply"), self.tr("Start"), self.tr("End"), self.tr("Gain")])
         self.btn_goto.setText(self.tr("Go to selected segment"))
@@ -800,6 +830,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sp_target.setValue(self.settings.target_db)
         self.sp_target.blockSignals(False)
 
+        self.sp_boost.blockSignals(True)
+        self.sp_boost.setValue(self.settings.global_boost_db)
+        self.sp_boost.blockSignals(False)
+
         self.sp_maxgain.blockSignals(True)
         self.sp_maxgain.setValue(self.settings.max_gain_db)
         self.sp_maxgain.blockSignals(False)
@@ -851,6 +885,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_params_changed(self):
         self.settings.target_db = self.sp_target.value()
+        self.settings.global_boost_db = self.sp_boost.value()
         self.settings.max_gain_db = self.sp_maxgain.value()
         self.settings.slow_s = self.sp_slow.value()
         self.settings.content_floor_db = self.sp_content.value()

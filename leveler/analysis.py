@@ -25,6 +25,7 @@ class Settings:
     ref_percentile: float = 90.0      # percentile used as reference (music)
     ref_manual_db: float | None = None
     target_db: float = 0.0            # target (voice) level in dB relative to the music
+    global_boost_db: float = 0.0      # constant boost applied to the whole file
     max_gain_db: float = 24.0
     allow_attenuate: bool = False
     max_atten_db: float = 6.0
@@ -306,6 +307,7 @@ def compute_gain(res: AnalysisResult, settings: Settings,
 
     g = _asym_follow(desired, res.hop_s, settings.rise_s, settings.fall_s)
     g = _moving_average(g, 0.5 / hop)
+    g = g + settings.global_boost_db
     np.clip(g, lo, settings.max_gain_db, out=g)
     return g.astype(np.float32)
 
