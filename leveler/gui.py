@@ -55,6 +55,7 @@ class Worker(QtCore.QThread):
     """Runs a heavy function in the background, with progress and cancellation."""
 
     progressed = QtCore.pyqtSignal(float)
+    statusChanged = QtCore.pyqtSignal(str)
     failed = QtCore.pyqtSignal(str)
 
     def __init__(self, fn, parent=None):
@@ -67,7 +68,7 @@ class Worker(QtCore.QThread):
 
     def run(self):
         try:
-            self._fn(self.progressed.emit, lambda: self._cancel)
+            self._fn(self.progressed.emit, self.statusChanged.emit, lambda: self._cancel)
         except Cancelled:
             pass
         except Exception as exc:                      # noqa: BLE001
@@ -165,7 +166,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.bar = QtWidgets.QProgressBar()
         self.bar.setRange(0, 1000)
         self.bar.setValue(0)
-        self.bar.setTextVisible(False)
+        self.bar.setTextVisible(True)
+        self.bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.bar.setFormat("")
         bottom.addWidget(self.bar, 1)
         root.addLayout(bottom)
 
@@ -545,7 +548,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.busy = busy
         if busy:
             self.bar.setValue(0)
+            self.bar.setFormat("%p% — " + msg)
             self.status.showMessage(msg)
+        else:
+            self.bar.setValue(0)
+            self.bar.setFormat("")
         self._update_enabled()
 
     def _start(self, fn, msg: str, on_done=None):
@@ -554,6 +561,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._busy(True, msg)
         w = Worker(fn, self)
         w.progressed.connect(lambda p: self.bar.setValue(int(p * 1000)))
+        w.statusChanged.connect(self._on_worker_status)
         w.failed.connect(self._on_worker_error)
         if on_done is not None:
             w.finished.connect(on_done)
@@ -561,8 +569,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker = w
         w.start()
 
+    def _on_worker_status(self, msg: str):
+        self.bar.setFormat("%p% — " + msg)
+        self.status.showMessage(msg)
+
     def _job_finished(self):
-        self.bar.setValue(1000)
         w, self.worker = self.worker, None
         self._busy(False)
         if w is not None:
@@ -606,10 +617,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._render_path = None
         self._render_dirty = True
 
-        def job(progress, cancel):
+        def job(progress, status, cancel):
+            status(self.tr("Opening file…"))
             audio = AudioFile(path)                    # converts to float if needed
+            status(self.tr("Building waveform…"))
             levels = WaveLevels(audio, progress=lambda p: progress(p * 0.55),
                                 cancel=cancel)
+            status(self.tr("Analyzing levels…"))
             res, gain = analyze(audio, self._settings_copy(),
                                 progress=lambda p: progress(0.55 + p * 0.45),
                                 cancel=cancel)
@@ -1044,7 +1058,8 @@ class MainWindow(QtWidgets.QMainWindow):
         out = os.path.join(self._tempdir, "corrected_preview.wav")
         audio, res, gain, s = self.audio, self.res, self.gain.copy(), self._settings_copy()
 
-        def job(progress, cancel):
+        def job(progress, status, cancel):
+            status(self.tr("Rendering preview…"))
             export_corrected(audio, res, gain, s, out, bits=16,
                              progress=progress, cancel=cancel)
             self._render_path = out
@@ -1070,7 +1085,8 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         audio, res, gain, s = self.audio, self.res, self.gain.copy(), self._settings_copy()
 
-        def job(progress, cancel):
+        def job(progress, status, cancel):
+            status(self.tr("Exporting audio…"))
             export_corrected(audio, res, gain, s, out, bits=16,
                              progress=progress, cancel=cancel)
 
