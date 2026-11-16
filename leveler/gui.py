@@ -124,6 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker: Worker | None = None
         self.busy = False
         self.profiles = ProfileManager()
+        self._last_dir: str | None = None
         self._tempdir = tempfile.mkdtemp(prefix="leveler_")
         self._render_path: str | None = None
         self._render_dirty = True
@@ -383,7 +384,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return s
 
         self.sp_target = spin(-30, 12, self.settings.target_db, 0.5, 1, " dB")
-        self.sp_boost = spin(0, 10, self.settings.global_boost_db, 0.5, 1, " dB")
+        self.sp_boost = spin(0, 20, self.settings.global_boost_db, 0.5, 1, " dB")
         self.sp_maxgain = spin(0, 48, self.settings.max_gain_db, 1, 1, " dB")
         self.sp_slow = spin(1, 120, self.settings.slow_s, 1, 0, " s")
         self.sp_content = spin(5, 60, self.settings.content_floor_db, 1, 0, " dB")
@@ -599,11 +600,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # ------------------------------------------------------------------ open and analyze
     def open_file(self):
+        if self._last_dir and os.path.isdir(self._last_dir):
+            default_dir = self._last_dir
+        else:
+            default_dir = os.path.expanduser("~/Música/Recordings")
+
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, self.tr("Open recording"), os.path.expanduser("~/Música/Recordings"),
+            self, self.tr("Open recording"), default_dir,
             self.tr("Audio (*.wav *.flac *.mp3 *.aiff *.ogg);;All files (*)"))
         if not path:
             return
+
+        # Remember the folder where we opened the file
+        self._last_dir = os.path.dirname(path)
         self._open_path(path)
 
     def _open_path(self, path: str):
