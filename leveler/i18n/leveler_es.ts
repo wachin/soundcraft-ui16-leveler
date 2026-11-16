@@ -4,365 +4,375 @@
   <context>
     <name>MainWindow</name>
     <message>
-      <location filename="../gui.py" line="460" />
+      <location filename="../gui.py" line="388" />
+      <source>Constant gain added to the entire recording. Useful when the reference level is too low or for voice-only recordings.</source>
+      <translation>Ganancia constante añadida a toda la grabación. Útil cuando el nivel de referencia es muy bajo o para grabaciones solo de voz.</translation>
+    </message>
+    <message>
+      <location filename="../gui.py" line="464" />
+      <source>Leveler — %s</source>
+      <translation>Nivelador — %s</translation>
+    </message>
+    <message>
+      <location filename="../gui.py" line="466" />
       <source>Leveler — volume correction for console recordings</source>
       <translation>Nivelador — corrección de volumen para grabaciones de consola</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="461" />
+      <location filename="../gui.py" line="467" />
       <source>&amp;Language</source>
       <translation>&amp;Idioma</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="462" />
+      <location filename="../gui.py" line="468" />
       <source>Main</source>
       <translation>Principal</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="464" />
+      <location filename="../gui.py" line="470" />
       <source>Open…</source>
       <translation>Abrir…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="465" />
+      <location filename="../gui.py" line="471" />
       <source>Prepare correction</source>
       <translation>Preparar corrección</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1034" />
+      <location filename="../gui.py" line="1048" />
+      <location filename="../gui.py" line="1014" />
       <location filename="../gui.py" line="1000" />
-      <location filename="../gui.py" line="986" />
-      <location filename="../gui.py" line="973" />
-      <location filename="../gui.py" line="468" />
+      <location filename="../gui.py" line="987" />
+      <location filename="../gui.py" line="474" />
       <source>Pause</source>
       <translation>Pausar</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1048" />
-      <location filename="../gui.py" line="1006" />
-      <location filename="../gui.py" line="994" />
-      <location filename="../gui.py" line="468" />
+      <location filename="../gui.py" line="1062" />
+      <location filename="../gui.py" line="1020" />
+      <location filename="../gui.py" line="1008" />
+      <location filename="../gui.py" line="474" />
       <source>Play</source>
       <translation>Reproducir</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="469" />
+      <location filename="../gui.py" line="475" />
       <source>Stop</source>
       <translation>Detener</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="470" />
+      <location filename="../gui.py" line="476" />
       <source>  Listen: </source>
       <translation>  Escuchar: </translation>
     </message>
     <message>
-      <location filename="../gui.py" line="471" />
+      <location filename="../gui.py" line="477" />
       <source>Zoom in</source>
       <translation>Acercar</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="472" />
+      <location filename="../gui.py" line="478" />
       <source>Zoom out</source>
       <translation>Alejar</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="473" />
+      <location filename="../gui.py" line="479" />
       <source>Fit all</source>
       <translation>Ver todo</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="474" />
+      <location filename="../gui.py" line="480" />
       <source>Export WAV…</source>
       <translation>Exportar WAV…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="479" />
+      <location filename="../gui.py" line="485" />
       <source>Original</source>
       <translation>Original</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="479" />
+      <location filename="../gui.py" line="485" />
       <source>Corrected</source>
       <translation>Corregido</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="486" />
+      <location filename="../gui.py" line="492" />
       <source>(no file)</source>
       <translation>(sin archivo)</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="489" />
+      <location filename="../gui.py" line="495" />
       <source>Channel %d</source>
       <translation>Canal %d</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="490" />
+      <location filename="../gui.py" line="496" />
       <source>dB</source>
       <translation>dB</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="492" />
+      <location filename="../gui.py" line="498" />
       <source>Progress</source>
       <translation>Progreso</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="494" />
+      <location filename="../gui.py" line="500" />
       <source>Profiles</source>
       <translation>Perfiles</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="495" />
+      <location filename="../gui.py" line="501" />
       <source>Save current settings to a profile</source>
       <translation>Guardar ajustes actuales en un perfil</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="497" />
+      <location filename="../gui.py" line="503" />
       <source>Delete selected profile</source>
       <translation>Eliminar perfil seleccionado</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="501" />
+      <location filename="../gui.py" line="507" />
       <source>Analysis</source>
       <translation>Análisis</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="502" />
+      <location filename="../gui.py" line="508" />
       <source>Reference level (music):</source>
       <translation>Nivel de referencia (música):</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="512" />
-      <location filename="../gui.py" line="503" />
+      <location filename="../gui.py" line="518" />
+      <location filename="../gui.py" line="509" />
       <source>Target level (voice):</source>
       <translation>Nivel objetivo (voz):</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="504" />
+      <location filename="../gui.py" line="510" />
       <source>Noise floor:</source>
       <translation>Piso de ruido:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="505" />
+      <location filename="../gui.py" line="511" />
       <source>Predicted peak after correction:</source>
       <translation>Pico previsto tras corregir:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="506" />
+      <location filename="../gui.py" line="512" />
       <source>Segments with low volume:</source>
       <translation>Tramos con falta de volumen:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="508" />
+      <location filename="../gui.py" line="514" />
       <source>Correction parameters</source>
       <translation>Parámetros de corrección</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="509" />
+      <location filename="../gui.py" line="515" />
       <source>Detected segments</source>
       <translation>Tramos detectados</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="513" />
+      <location filename="../gui.py" line="519" />
       <source>Global boost:</source>
       <translation>Aumento global:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="514" />
+      <location filename="../gui.py" line="520" />
       <source>Level the voice is taken to, in dB relative to the music: 0 dB = same as the music, negative = quieter, positive = louder.</source>
       <translation>Nivel al que se lleva la voz, en dB respecto a la música: 0 dB = igual que la música, negativo = más baja, positivo = más alta.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="517" />
+      <location filename="../gui.py" line="523" />
       <source>Maximum gain:</source>
       <translation>Ganancia máxima:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="518" />
+      <location filename="../gui.py" line="524" />
       <source>Region size:</source>
       <translation>Tamaño de región:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="519" />
+      <location filename="../gui.py" line="525" />
       <source>Content threshold:</source>
       <translation>Umbral de contenido:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="520" />
+      <location filename="../gui.py" line="526" />
       <source>Ceiling:</source>
       <translation>Techo:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="521" />
+      <location filename="../gui.py" line="527" />
       <source>Enable limiter</source>
       <translation>Activar limitador</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="522" />
+      <location filename="../gui.py" line="528" />
       <source>Allow lowering volume</source>
       <translation>Permitir bajar volumen</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="523" />
+      <location filename="../gui.py" line="529" />
       <source>Maximum attenuation:</source>
       <translation>Atenuación máxima:</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="526" />
+      <location filename="../gui.py" line="532" />
       <source>Apply</source>
       <translation>Aplicar</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="526" />
+      <location filename="../gui.py" line="532" />
       <source>Start</source>
       <translation>Inicio</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="526" />
+      <location filename="../gui.py" line="532" />
       <source>End</source>
       <translation>Fin</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="526" />
+      <location filename="../gui.py" line="532" />
       <source>Gain</source>
       <translation>Ganancia</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="527" />
+      <location filename="../gui.py" line="533" />
       <source>Go to selected segment</source>
       <translation>Ir al tramo seleccionado</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="533" />
+      <location filename="../gui.py" line="539" />
       <source>Ready. Open a recording to begin.</source>
       <translation>Listo. Abra una grabación para comenzar.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="583" />
+      <location filename="../gui.py" line="589" />
       <source>Error</source>
       <translation>Error</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="584" />
+      <location filename="../gui.py" line="590" />
       <source>Error: </source>
       <translation>Error: </translation>
     </message>
     <message>
-      <location filename="../gui.py" line="603" />
+      <location filename="../gui.py" line="614" />
       <source>Open recording</source>
       <translation>Abrir grabación</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="604" />
+      <location filename="../gui.py" line="615" />
       <source>Audio (*.wav *.flac *.mp3 *.aiff *.ogg);;All files (*)</source>
       <translation>Audio (*.wav *.flac *.mp3 *.aiff *.ogg);;Todos los archivos (*)</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="621" />
+      <location filename="../gui.py" line="635" />
       <source>Opening file…</source>
       <translation>Abriendo archivo…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="623" />
+      <location filename="../gui.py" line="637" />
       <source>Building waveform…</source>
       <translation>Construyendo onda…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="626" />
+      <location filename="../gui.py" line="640" />
       <source>Analyzing levels…</source>
       <translation>Analizando niveles…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="635" />
+      <location filename="../gui.py" line="649" />
       <source>Analyzing “%s”…</source>
       <translation>Analizando «%s»…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="654" />
+      <location filename="../gui.py" line="668" />
       <source>Ready: %s. Click on the waveform to play from that point.</source>
       <translation>Listo: %s. Haga clic sobre la onda para reproducir desde ese punto.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="886" />
+      <location filename="../gui.py" line="900" />
       <source>Profile saved: %s</source>
       <translation>Perfil guardado: %s</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="893" />
+      <location filename="../gui.py" line="907" />
       <source>Delete profile</source>
       <translation>Eliminar perfil</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="894" />
+      <location filename="../gui.py" line="908" />
       <source>Are you sure you want to delete the profile “%s”?</source>
       <translation>¿Está seguro de que desea eliminar el perfil «%s»?</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="898" />
+      <location filename="../gui.py" line="912" />
       <source>Profile deleted: %s</source>
       <translation>Perfil eliminado: %s</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="934" />
+      <location filename="../gui.py" line="948" />
       <source>%+.1f dB  →  voice at %.1f dBFS</source>
       <translation>%+.1f dB  →  voz a %.1f dBFS</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="987" />
+      <location filename="../gui.py" line="1001" />
       <source>Playing from %s</source>
       <translation>Reproduciendo desde %s</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1013" />
+      <location filename="../gui.py" line="1027" />
       <source>The correction is not ready yet; use “Prepare correction”.</source>
       <translation>Aún no está preparada la corrección; use «Preparar corrección».</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1025" />
+      <location filename="../gui.py" line="1039" />
       <source>Press “Prepare correction” before listening to the corrected version.</source>
       <translation>Pulse «Preparar corrección» antes de escuchar la versión corregida.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1052" />
+      <location filename="../gui.py" line="1066" />
       <source>Player: </source>
       <translation>Reproductor: </translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1062" />
+      <location filename="../gui.py" line="1076" />
       <source>Rendering preview…</source>
       <translation>Generando vista previa…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1068" />
+      <location filename="../gui.py" line="1082" />
       <source>Preparing the corrected version for listening…</source>
       <translation>Preparando la versión corregida para escuchar…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1072" />
+      <location filename="../gui.py" line="1086" />
       <source>Correction ready. Choose “Corrected” to listen to the A/B comparison.</source>
       <translation>Corrección preparada. Elija «Corregido» para escuchar la comparación A/B.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1083" />
+      <location filename="../gui.py" line="1097" />
       <source>Save corrected audio</source>
       <translation>Guardar audio corregido</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1083" />
+      <location filename="../gui.py" line="1097" />
       <source>WAV (*.wav)</source>
       <translation>WAV (*.wav)</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1089" />
+      <location filename="../gui.py" line="1103" />
       <source>Exporting audio…</source>
       <translation>Exportando audio…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1093" />
+      <location filename="../gui.py" line="1107" />
       <source>Exporting “%s”…</source>
       <translation>Exportando «%s»…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1095" />
+      <location filename="../gui.py" line="1109" />
       <source>Exported: %s (the original file was not modified).</source>
       <translation>Exportado: %s (el archivo original no fue modificado).</translation>
     </message>

@@ -385,6 +385,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.sp_target = spin(-30, 12, self.settings.target_db, 0.5, 1, " dB")
         self.sp_boost = spin(0, 20, self.settings.global_boost_db, 0.5, 1, " dB")
+        self.sp_boost.setToolTip(self.tr("Constant gain added to the entire recording. "
+                                        "Useful when the reference level is too low or for voice-only recordings."))
         self.sp_maxgain = spin(0, 48, self.settings.max_gain_db, 1, 1, " dB")
         self.sp_slow = spin(1, 120, self.settings.slow_s, 1, 0, " s")
         self.sp_content = spin(5, 60, self.settings.content_floor_db, 1, 0, " dB")
@@ -458,7 +460,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _retranslate(self):
         """Writes every visible text again in the currently installed language."""
-        self.setWindowTitle(self.tr("Leveler — volume correction for console recordings"))
+        if self.audio is not None:
+            self.setWindowTitle(self.tr("Leveler — %s") % os.path.basename(self.audio.path))
+        else:
+            self.setWindowTitle(self.tr("Leveler — volume correction for console recordings"))
         self.mnu_lang.setTitle(self.tr("&Language"))
         self.toolbar.setWindowTitle(self.tr("Main"))
 
