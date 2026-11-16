@@ -133,6 +133,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._playing_path: str | None = None
         self._pending_seek: tuple[float, bool] | None = None
         self.lang_actions: list[tuple[str, QtGui.QAction]] = []
+        self._select_mode = False
+        self._select_region: pg.LinearRegionItem | None = None
+        self._select_start: float | None = None
 
         pg.setConfigOptions(antialias=False)
         pg.setConfigOption("background", "#161a20")
@@ -230,6 +233,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar.addAction(self.act_zoom_out)
         self.act_fit = self._make_action(icon_path, "fit.svg", "Fit all", self.fit_view)
         self.toolbar.addAction(self.act_fit)
+
+        # Selection tool
+        self.act_select = self._make_action(icon_path, "select.svg", "Select range", self._toggle_select_mode)
+        self.act_select.setCheckable(True)
+        self.toolbar.addAction(self.act_select)
+
+        # Selection gain control (shown when selection exists)
+        self.sp_sel_gain = QtWidgets.QDoubleSpinBox()
+        self.sp_sel_gain.setRange(-24, 24)
+        self.sp_sel_gain.setValue(0.0)
+        self.sp_sel_gain.setSingleStep(0.5)
+        self.sp_sel_gain.setDecimals(1)
+        self.sp_sel_gain.setSuffix(" dB")
+        self.sp_sel_gain.setFixedWidth(90)
+        self.sp_sel_gain.setToolTip(self.tr("Gain to apply to the selected range"))
+        self.sp_sel_gain.editingFinished.connect(self._apply_selection_gain)
+        self.sp_sel_gain.hide()
+        self.toolbar.addWidget(self.sp_sel_gain)
+
         self.toolbar.addSeparator()
         self.act_export = self._make_action(icon_path, "export.svg", "Export WAV…", self.export_file, "Ctrl+E")
         self.toolbar.addAction(self.act_export)
@@ -321,8 +343,10 @@ class MainWindow(QtWidgets.QMainWindow):
         plot.setMouseEnabled(x=True, y=False)
         plot.setMenuEnabled(False)
         plot.hideButtons()
-        plot.getViewBox().setMouseMode(pg.ViewBox.PanMode)
-        plot.getViewBox().seeked.connect(self._seek_to)
+        vb = plot.getViewBox()
+        vb.setMouseMode(pg.ViewBox.PanMode)
+        vb.installEventFilter(self)  # for selection mode
+        vb.seeked.connect(self._seek_to)
         return plot
 
     def eventFilter(self, obj, ev):
@@ -330,7 +354,80 @@ class MainWindow(QtWidgets.QMainWindow):
             if isinstance(obj, (QtWidgets.QAbstractSpinBox, QtWidgets.QComboBox)):
                 ev.ignore()
                 return True
+
+        # Handle mouse events for selection mode
+        if self._select_mode and self.res is not None:
+            if isinstance(obj, pg.ViewBox):
+                if ev.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
+                    if ev.button() == Qt.MouseButton.LeftButton:
+                        self._selection_press(obj, ev)
+                        return True
+                elif ev.type() == QtCore.QEvent.Type.GraphicsSceneMouseMove:
+                    if ev.buttons() & Qt.MouseButton.LeftButton:
+                        self._selection_move(obj, ev)
+                        return True
+                elif ev.type() == QtCore.QEvent.Type.GraphicsSceneMouseRelease:
+                    if ev.button() == Qt.MouseButton.LeftButton:
+                        self._selection_release(obj, ev)
+                        return True
+
         return super().eventFilter(obj, ev)
+
+    def _selection_press(self, vb: pg.ViewBox, ev):
+        """Start a new selection on mouse press."""
+        pos = vb.mapSceneToView(ev.scenePos())
+        x = pos.x()
+        x = max(0.0, min(self.audio.duration, x))
+        self._select_start = x
+        # Create a temporary region
+        self._select_region = pg.LinearRegionItem([x, x], movable=False,
+                                                   brush=pg.mkBrush(255, 255, 0, 50),
+                                                   pen=pg.mkPen("#ff0", width=1, style=Qt.PenStyle.DashLine))
+        for plot in self.plots:
+            plot.addItem(self._select_region)
+
+    def _selection_move(self, vb: pg.ViewBox, ev):
+        """Update selection region on mouse drag."""
+        if self._select_region is None or self._select_start is None:
+            return
+        pos = vb.mapSceneToView(ev.scenePos())
+        x = pos.x()
+        x = max(0.0, min(self.audio.duration, x))
+        start, end = sorted([self._select_start, x])
+        self._select_region.setRegion([start, end])
+
+    def _selection_release(self, vb: pg.ViewBox, ev):
+        """Finalize selection on mouse release."""
+        if self._select_region is None or self._select_start is None:
+            return
+        pos = vb.mapSceneToView(ev.scenePos())
+        x = pos.x()
+        x = max(0.0, min(self.audio.duration, x))
+        start, end = sorted([self._select_start, x])
+
+        # Remove temporary region
+        for plot in self.plots:
+            plot.removeItem(self._select_region)
+
+        if end - start < 0.1:
+            self._select_region = None
+            self._select_start = None
+            self.sp_sel_gain.hide()
+            return
+
+        # Create persistent selection region
+        self._select_region = pg.LinearRegionItem([start, end], movable=True,
+                                                   brush=pg.mkBrush(255, 255, 0, 50),
+                                                   pen=pg.mkPen("#ff0", width=1))
+        self._select_region.sigRegionChanged.connect(self._on_select_region_changed)
+        for plot in self.plots:
+            plot.addItem(self._select_region)
+
+        self.sp_sel_gain.show()
+        self.sp_sel_gain.setValue(0.0)
+        self.sp_sel_gain.setFocus()
+        self.status.showMessage(self.tr("Selection: %s – %s. Set gain and press Enter.")
+                                % (self._mmss(start), self._mmss(end)))
 
     def _build_side_panel(self):
         panel = QtWidgets.QWidget()
@@ -510,6 +607,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.act_fit.setToolTip(self.tr("Fit all"))
         self.act_export.setText(self.tr("Export WAV…"))
         self.act_export.setToolTip(self.tr("Export WAV…"))
+        self.act_select.setText(self.tr("Select range"))
+        self.act_select.setToolTip(self.tr("Select a range on the waveform to apply gain/attenuation"))
 
         idx = self.cmb_ab.currentIndex()
         self.cmb_ab.blockSignals(True)
@@ -869,6 +968,69 @@ class MainWindow(QtWidgets.QMainWindow):
         seg = self.res.segments[r]
         pad = max(2.0, 0.15 * seg.duration)
         self._set_range(seg.start_s - pad, seg.end_s + pad)
+
+    # ------------------------------------------------------------------ manual selection
+    def _toggle_select_mode(self, checked: bool):
+        self._select_mode = checked
+        if checked:
+            self.status.showMessage(self.tr("Select mode: drag on the waveform to choose a range"))
+            # Change mouse mode to rectangle selection on all plots
+            for plot in self.plots:
+                vb = plot.getViewBox()
+                vb.setMouseMode(pg.ViewBox.RectMode)
+        else:
+            self._clear_selection()
+            self.status.showMessage(self.tr("Ready"))
+
+    def _clear_selection(self):
+        if self._select_region is not None:
+            for plot in self.plots:
+                plot.removeItem(self._select_region)
+            self._select_region = None
+            self._select_start = None
+        self.sp_sel_gain.hide()
+        self.sp_sel_gain.setValue(0.0)
+        self.act_select.blockSignals(True)
+        self.act_select.setChecked(False)
+        self.act_select.blockSignals(False)
+        for plot in self.plots:
+            vb = plot.getViewBox()
+            vb.setMouseMode(pg.ViewBox.PanMode)
+
+    def _on_select_region_changed(self, region: pg.LinearRegionItem):
+        if self.res is None:
+            return
+        r = region.getRegion()
+        start, end = sorted(r)
+        # Update the selection gain spinbox tooltip with current range
+        self.sp_sel_gain.setToolTip(self.tr("Gain for range %s – %s") % (self._mmss(start), self._mmss(end)))
+
+    def _apply_selection_gain(self, gain_db: float):
+        """Creates/updates a segment for the current selection with the given gain."""
+        if self.res is None or self._select_region is None:
+            return
+        r = self._select_region.getRegion()
+        start, end = sorted(r)
+        if end - start < 0.1:
+            return
+        # Create a new segment for this selection
+        seg = Segment(
+            i0=0, i1=0,  # will be set by segment_range
+            start_s=start, end_s=end,
+            level_db=0.0, gain_db=gain_db,
+            trim_db=gain_db,  # use trim_db to apply the gain
+            enabled=True
+        )
+        # Add to segments list
+        self.res.segments.append(seg)
+        # Recompute gain with the new segment
+        self._recompute_gain(keep_segments=True)
+        self._refresh_seg_table()
+        self._render_segment_regions()
+        self._redraw()
+        # Clear selection after applying
+        self.act_select.setChecked(False)
+        self._toggle_select_mode(False)
 
     # ------------------------------------------------------------------ parameters
     def _refresh_profiles(self):
