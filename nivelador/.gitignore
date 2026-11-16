@@ -1,0 +1,73 @@
+# SoundCraft UI16 Leveler — files git should ignore
+
+# ----------------------------------------------------------------- Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ----------------------------------------------------------------- environments
+.venv/
+venv/
+env/
+ENV/
+.env
+.python-version
+
+# ----------------------------------------------------------------- build / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# ----------------------------------------------------------------- caches and coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# ----------------------------------------------------------------- Qt Linguist
+# The .ts files are the translation sources and must be committed. The compiled
+# .qm files are committed as well, so the app offers its languages right after
+# cloning. Uncomment the next line if you prefer to build them with `lrelease`
+# and commit only the .ts files.
+# *.qm
+
+# backups left by Qt Linguist
+*.ts.bak
+*.qm.bak
+
+# ----------------------------------------------------------------- recordings and audio
+# Recordings are large (a 150 min service is ~1.7 GB) and must never be pushed.
+# This also covers the rendered A/B preview (corrected_preview.wav) and the
+# exports (*_nivelado.wav).
+*.wav
+*.flac
+*.mp3
+*.aiff
+*.aif
+*.ogg
+*.m4a
+# half-written export (analysis.export_corrected writes to "<output>.parcial")
+*.parcial
+
+# ----------------------------------------------------------------- logs
+*.log
+
+# ----------------------------------------------------------------- editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.user
+
+# ----------------------------------------------------------------- OS
+.DS_Store
+Thumbs.db
+desktop.ini
+.directory
