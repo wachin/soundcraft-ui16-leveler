@@ -135,7 +135,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._pending_seek: tuple[float, bool] | None = None
         self.lang_actions: list[tuple[str, QtGui.QAction]] = []
         self._select_mode = False
-        self._select_region: pg.LinearRegionItem | None = None
+        self._select_region: pg.LinearRegionItem | None = None  # temporary region during drag
+        self._select_regions: list[pg.LinearRegionItem] = []  # persistent regions per plot
         self._select_start: float | None = None
         self._history: list[tuple[list[Segment], np.ndarray]] = []  # (segments, gain)
         self._history_index: int = -1
@@ -393,49 +394,60 @@ class MainWindow(QtWidgets.QMainWindow):
         x = pos.x()
         x = max(0.0, min(self.audio.duration, x))
         self._select_start = x
-        # Create a temporary region
+        # Create temporary regions (one per plot)
         self._select_region = pg.LinearRegionItem([x, x], movable=False,
                                                    brush=pg.mkBrush(255, 255, 0, 50),
                                                    pen=pg.mkPen("#ff0", width=1, style=Qt.PenStyle.DashLine))
         for plot in self.plots:
-            plot.addItem(self._select_region)
+            region = pg.LinearRegionItem([x, x], movable=False,
+                                          brush=pg.mkBrush(255, 255, 0, 50),
+                                          pen=pg.mkPen("#ff0", width=1, style=Qt.PenStyle.DashLine))
+            plot.addItem(region)
+            self._select_regions.append(region)
 
     def _selection_move(self, vb: pg.ViewBox, ev):
         """Update selection region on mouse drag."""
-        if self._select_region is None or self._select_start is None:
+        if self._select_start is None:
             return
         pos = vb.mapSceneToView(ev.scenePos())
         x = pos.x()
         x = max(0.0, min(self.audio.duration, x))
         start, end = sorted([self._select_start, x])
-        self._select_region.setRegion([start, end])
+        for region in self._select_regions:
+            region.setRegion([start, end])
 
     def _selection_release(self, vb: pg.ViewBox, ev):
         """Finalize selection on mouse release."""
-        if self._select_region is None or self._select_start is None:
+        if self._select_start is None:
             return
         pos = vb.mapSceneToView(ev.scenePos())
         x = pos.x()
         x = max(0.0, min(self.audio.duration, x))
         start, end = sorted([self._select_start, x])
 
-        # Remove temporary region
-        for plot in self.plots:
-            plot.removeItem(self._select_region)
+        # Remove temporary regions
+        for region in self._select_regions:
+            for plot in self.plots:
+                try:
+                    plot.removeItem(region)
+                except Exception:
+                    pass
+        self._select_regions.clear()
 
         if end - start < 0.1:
-            self._select_region = None
             self._select_start = None
             self.sp_sel_gain.hide()
             return
 
-        # Create persistent selection region
-        self._select_region = pg.LinearRegionItem([start, end], movable=True,
-                                                   brush=pg.mkBrush(255, 255, 0, 50),
-                                                   pen=pg.mkPen("#ff0", width=1))
-        self._select_region.sigRegionChanged.connect(self._on_select_region_changed)
+        # Create persistent selection regions (one per plot)
+        self._select_regions = []
         for plot in self.plots:
-            plot.addItem(self._select_region)
+            region = pg.LinearRegionItem([start, end], movable=True,
+                                          brush=pg.mkBrush(255, 255, 0, 50),
+                                          pen=pg.mkPen("#ff0", width=1))
+            region.sigRegionChanged.connect(self._on_select_region_changed)
+            plot.addItem(region)
+            self._select_regions.append(region)
 
         self.sp_sel_gain.show()
         self.sp_sel_gain.setValue(0.0)
@@ -1072,11 +1084,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.status.showMessage(self.tr("Ready"))
 
     def _clear_selection(self):
-        if self._select_region is not None:
+        for region in self._select_regions:
             for plot in self.plots:
-                plot.removeItem(self._select_region)
-            self._select_region = None
-            self._select_start = None
+                try:
+                    plot.removeItem(region)
+                except Exception:
+                    pass
+        self._select_regions.clear()
+        self._select_start = None
         self.sp_sel_gain.hide()
         self.sp_sel_gain.setValue(0.0)
         self.act_del_sel.setEnabled(False)
@@ -1092,14 +1107,20 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         r = region.getRegion()
         start, end = sorted(r)
+        # Sync all regions to the same range
+        for reg in self._select_regions:
+            if reg is not region:
+                reg.blockSignals(True)
+                reg.setRegion([start, end])
+                reg.blockSignals(False)
         # Update the selection gain spinbox tooltip with current range
         self.sp_sel_gain.setToolTip(self.tr("Gain for range %s – %s") % (self._mmss(start), self._mmss(end)))
 
     def _apply_selection_gain(self, gain_db: float):
         """Creates/updates a segment for the current selection with the given gain."""
-        if self.res is None or self._select_region is None:
+        if self.res is None or not self._select_regions:
             return
-        r = self._select_region.getRegion()
+        r = self._select_regions[0].getRegion()
         start, end = sorted(r)
         if end - start < 0.1:
             return
@@ -1125,9 +1146,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _delete_selection(self):
         """Deletes the selected range from the audio file."""
-        if self.res is None or self._select_region is None or self.audio is None:
+        if self.res is None or not self._select_regions or self.audio is None:
             return
-        r = self._select_region.getRegion()
+        r = self._select_regions[0].getRegion()
         start, end = sorted(r)
         if end - start < 0.1:
             return
