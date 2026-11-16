@@ -124,7 +124,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker: Worker | None = None
         self.busy = False
         self.profiles = ProfileManager()
-        self._last_dir: str | None = None
+        self.settings_q = QtCore.QSettings("Leveler", "Leveler")
+        self._last_dir = self.settings_q.value("last_dir", "", str)
         self._tempdir = tempfile.mkdtemp(prefix="leveler_")
         self._render_path: str | None = None
         self._render_dirty = True
@@ -384,7 +385,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return s
 
         self.sp_target = spin(-30, 12, self.settings.target_db, 0.5, 1, " dB")
-        self.sp_boost = spin(0, 20, self.settings.global_boost_db, 0.5, 1, " dB")
+        self.sp_boost = spin(0, 25, self.settings.global_boost_db, 0.5, 1, " dB")
         self.sp_boost.setToolTip(self.tr("Constant gain added to the entire recording. "
                                         "Useful when the reference level is too low or for voice-only recordings."))
         self.sp_maxgain = spin(0, 48, self.settings.max_gain_db, 1, 1, " dB")
@@ -618,6 +619,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Remember the folder where we opened the file
         self._last_dir = os.path.dirname(path)
+        self.settings_q.setValue("last_dir", self._last_dir)
         self._open_path(path)
 
     def _open_path(self, path: str):

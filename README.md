@@ -205,6 +205,10 @@ The mouse wheel zooms in and out around the pointer, dragging over the waveform
 pans the view, and the horizontal scroll bar at the bottom moves along the whole
 file.
 
+**Persistence:** The program remembers the last folder you opened a file from and
+restores it on the next launch. The window title shows the currently open file
+name.
+
 ## How it works
 
 1. **Level per frame.** RMS and peak are measured in 0.4 s windows with a 0.2 s
@@ -233,7 +237,8 @@ file.
 | Parameter | GUI range | Default | Meaning |
 | --- | --- | --- | --- |
 | Target level (voice) | −30 … +12 dB | 0.0 dB | Level the voice is taken to, relative to the music |
-| Maximum gain | 0 … 48 dB | 24 dB | Cap for the applied boost |
+| **Global boost** | **0 … 25 dB** | **0.0 dB** | **Constant gain added to the entire recording** |
+| Maximum gain | 0 … 48 dB | 48 dB | Cap for the applied boost (auto + global) |
 | Region size | 1 … 120 s | 12 s | Window used to measure the level of each region |
 | Content threshold | 5 … 60 dB | 30 dB | Below `reference − value` the audio is treated as silence/noise and not amplified |
 | Ceiling | −6 … 0 dBFS | −1 dBFS | Maximum output level of the limiter |
