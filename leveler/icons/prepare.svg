@@ -1,3 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-  <path fill="currentColor" d="M17.5 13H22v2h-4.5v2h3V19h-7v2h3v2H10v-2h3v-2H6v-2h3V9h4.5V7H14v-2h3.5c1.1 0 2 .9 2 2v3.5zm-11 6h3.5c.83 0 1.5-.67 1.5-1.5S18.83 16 18 16H15v4H6v-4zm8-13h-3V3h-2v2.5H8V3H6v2.5H3.5c-.83 0-1.5.67-1.5 1.5S2.67 6 3.5 6H6v4H3v4h3v2H3.5c-.83 0-1.5.67-1.5 1.5S2.67 18 3.5 18H6v-4h3v4h3v-4h2.5c.83 0 1.5-.67 1.5-1.5S12.83 10 12 10H9V6h3V3.5c0-.83.67-1.5 1.5-1.5S13.5 3 13.5 3.5V6zM6 10h9v4H6zm8 0h2.5c.83 0 1.5.67 1.5 1.5S18.83 16 18 16H15v-4h3zm0-10h2.5c.83 0 1.5.67 1.5 1.5S18.83 6 18 6H15V3h3zm-8 10H6v-4h2.5c.83 0 1.5.67 1.5 1.5S9.83 16 9 16H6v4h3z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 24 24"
+   width="18"
+   height="18"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="prepare.svg"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="15.318589"
+     inkscape:cx="8.9433826"
+     inkscape:cy="13.578274"
+     inkscape:window-width="1360"
+     inkscape:window-height="719"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <g
+     id="g1919"
+     inkscape:export-ydpi="90"
+     inkscape:export-xdpi="90"
+     inkscape:export-filename="/home/lamatin/Projekt_Kliparty/8.B prace/png/11) Nářadí a nástroje =)/g1919.png"
+     transform="matrix(-0.02209995,-0.02305962,-0.02305962,0.02209995,30.636115,8.6911871)"
+     style="fill:#000000">
+    <path
+       id="rect13105"
+       sodipodi:nodetypes="ccccc"
+       style="fill:#000000;stroke:#000000;stroke-width:2"
+       d="m 569.41,268.66 -390.73,1.45 -0.61,-97.33 248.97,-2.09 z" />
+    <rect
+       id="rect13108"
+       style="fill:#000000;stroke:#000000;stroke-width:2"
+       transform="matrix(-0.99998,0.0054211,-0.0062372,-0.99998,0,0)"
+       height="626.40997"
+       width="74.954002"
+       y="-895.09998"
+       x="-370.98999" />
+  </g>
 </svg>
