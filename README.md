@@ -41,6 +41,76 @@ music, positive = louder).
 - **Multilingual** interface (English source, reviewed with Qt Linguist; Spanish
   translation included).
 
+## User Guide
+
+### 1. Launching the program
+
+Open a terminal and type:
+
+```bash
+python3 -m leveler
+```
+
+You can also open a recording directly from the start:
+
+```bash
+python3 -m leveler uirec-20260802_203549.wav
+```
+
+### 2. Loading the audio
+
+Press **Open…** (or `Ctrl+O`) and choose one of your `uirec-*.wav` files. You will see a progress bar while it builds the waveform and analyzes the file. Once finished, the blue waveform for both channels will appear, along with a right panel showing the results and a green strip at the bottom representing the gain curve.
+
+### 3. Reading the results
+
+In the **Analysis** panel, you will see:
+
+- **Reference level (music)**: The measured loudness of the worship/music section.
+- **Target level (voice)**: The level the program will try to bring the voice to (`0.0 dB` by default, configurable).
+
+On the waveform: **blue** represents the original audio, and the **orange mask behind it** shows how it will look after correction. Areas where you see a lot of orange peeking out are the parts where volume is lacking. These segments are also highlighted with a yellow background.
+
+### 4. Navigating the waveform
+
+- **Mouse wheel**: Zoom in/out at the cursor position.
+- **Left-click and drag**: Scroll through the timeline.
+- **Horizontal scrollbar**: Jump to any part of the recording.
+- **Zoom in / Zoom out / Fit all** buttons on the toolbar.
+
+### 5. Adjusting the correction
+
+If the result doesn't satisfy you, change the values in the **Correction parameters** panel:
+
+- **Target level (voice)**: If the voice (sermon/speech) volume is still too low, increase these dB. `0 dB` means the voice will be at the same level as the music.
+- **Maximum gain**: The amplification limit (default `24 dB`). Increase it if the sermon remains too quiet after analysis.
+- **Region size**: The time window (default `12 s`) used to calculate the average level. A larger value makes the gain more stable; a smaller value makes it more responsive.
+- **Content threshold**: Prevents amplifying silence or background noise. Anything more than this many dB below the reference won't be boosted.
+- **Ceiling**: The maximum peak level allowed (default `-1.0 dBFS`) to prevent clipping.
+- **Enable limiter**: Keeps the audio from distorting when applying high gain.
+
+### 6. Using Profiles
+
+Since different recordings might use different microphones, you can save your settings:
+1. Type a name in the **Profiles** box (e.g., "Sermon_Mic1").
+2. Press the **Save** icon (💾).
+3. Next time, just select the profile from the list to apply your preferred settings instantly.
+
+### 7. A/B Comparison
+
+1. Press **Prepare correction** and wait (it generates a corrected copy in a temporary file).
+2. Use the **Original / Corrected** dropdown to switch between versions without losing your position; playback continues from where you were.
+3. **Play / Pause** with the button or the `Space` bar.
+
+If you change any parameters later, you must press **Prepare correction** again (the dropdown will remind you).
+
+### 8. Exporting
+
+Press **Export WAV…** (or `Ctrl+E`) and save. A new file named `<original>_corrected.wav` will be created (**WAV 16-bit 48 kHz**, matching the console's format). **The original file is never modified.**
+
+---
+
+**Practical Note**: Large files (1.7 GB / 150 min) take some time to analyze and prepare. Start by testing with a shorter file (e.g., `uirec-20260802_072526.wav`, 6.7 min) to get a feel for the parameters.
+
 ## Requirements
 
 - Python 3.9 or newer
