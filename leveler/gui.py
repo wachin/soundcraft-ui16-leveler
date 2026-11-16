@@ -260,6 +260,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sp_sel_gain.hide()
         self.toolbar.addWidget(self.sp_sel_gain)
 
+        # Delete selection button
+        self.act_del_sel = self._make_action(icon_path, "delete_selection.svg", self.tr("Delete selection"), self._delete_selection)
+        self.act_del_sel.setEnabled(False)
+        self.toolbar.addAction(self.act_del_sel)
+
         self.toolbar.addSeparator()
         self.act_export = self._make_action(icon_path, "export.svg", "Export WAV…", self.export_file, "Ctrl+E")
         self.toolbar.addAction(self.act_export)
@@ -434,6 +439,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sp_sel_gain.show()
         self.sp_sel_gain.setValue(0.0)
         self.sp_sel_gain.setFocus()
+        self.act_del_sel.setEnabled(True)
         self.status.showMessage(self.tr("Selection: %s – %s. Set gain and press Enter.")
                                 % (self._mmss(start), self._mmss(end)))
 
@@ -1056,6 +1062,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._select_start = None
         self.sp_sel_gain.hide()
         self.sp_sel_gain.setValue(0.0)
+        self.act_del_sel.setEnabled(False)
         self.act_select.blockSignals(True)
         self.act_select.setChecked(False)
         self.act_select.blockSignals(False)
@@ -1098,6 +1105,132 @@ class MainWindow(QtWidgets.QMainWindow):
         # Clear selection after applying
         self.act_select.setChecked(False)
         self._toggle_select_mode(False)
+
+    def _delete_selection(self):
+        """Deletes the selected range from the audio file."""
+        if self.res is None or self._select_region is None or self.audio is None:
+            return
+        r = self._select_region.getRegion()
+        start, end = sorted(r)
+        if end - start < 0.1:
+            return
+
+        # Confirm deletion
+        reply = QtWidgets.QMessageBox.question(
+            self, self.tr("Delete selection"),
+            self.tr("Delete the selected range (%s – %s)? This will create a new file.")
+            % (self._mmss(start), self._mmss(end)),
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
+        )
+        if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+            return
+
+        self._save_history()
+
+        # Run deletion in background thread
+        self._busy(True, self.tr("Deleting selection and re-analyzing…"))
+
+        def job(progress, status, cancel):
+            # Create a new audio file without the selected range
+            import tempfile
+            import wave
+            import numpy as np
+
+            sr = self.audio.sample_rate
+            ch = self.audio.channels
+            start_frame = int(start * sr)
+            end_frame = int(end * sr)
+
+            # Read the whole file in chunks, skipping the selection
+            tmp_path = tempfile.mktemp(suffix=".wav", prefix="leveler_del_")
+            w = WavWriter(tmp_path, sr, ch, 16)
+
+            try:
+                chunk_size = 1 << 20  # 1M frames
+                total_frames = self.audio.frames
+                written = 0
+
+                for chunk_start in range(0, total_frames, chunk_size):
+                    if cancel():
+                        raise Cancelled()
+                    chunk_end = min(total_frames, chunk_start + chunk_size)
+
+                    # Skip if this chunk overlaps with deletion range
+                    if chunk_end <= start_frame or chunk_start >= end_frame:
+                        # Entire chunk is outside deletion range
+                        data = self.audio.read(chunk_start, chunk_end - chunk_start)
+                        w.write(data)
+                        written += data.shape[0]
+                    else:
+                        # Chunk overlaps with deletion range - split it
+                        if chunk_start < start_frame:
+                            # Part before deletion
+                            data = self.audio.read(chunk_start, start_frame - chunk_start)
+                            w.write(data)
+                            written += data.shape[0]
+                        if chunk_end > end_frame:
+                            # Part after deletion
+                            data = self.audio.read(end_frame, chunk_end - end_frame)
+                            w.write(data)
+                            written += data.shape[0]
+
+                    if progress:
+                        progress(min(1.0, chunk_end / total_frames))
+
+                w.close()
+
+                if cancel():
+                    raise Cancelled()
+
+                # Now load the new file and re-analyze
+                status(self.tr("Re-analyzing…"))
+                new_audio = AudioFile(tmp_path)
+                levels = WaveLevels(new_audio, progress=lambda p: progress(p * 0.5) if progress else None, cancel=cancel)
+                res, gain = analyze(new_audio, self._settings_copy(),
+                                    progress=lambda p: progress(0.5 + p * 0.5) if progress else None, cancel=cancel)
+
+                # Update the main thread data
+                self.audio.close()
+                self.audio = new_audio
+                self.levels = levels
+                self.res = res
+                self.gain = gain
+                self._render_path = None
+                self._render_dirty = True
+
+                # Clean up temp file
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+
+            except Cancelled:
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+                raise
+            except Exception as e:
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+                raise e
+
+        def on_done():
+            self._clear_selection()
+            self._bind_audio()
+            self._refresh_seg_table()
+            self._refresh_info()
+            self.fit_view()
+            self._update_enabled()
+            self._show_ready_status()
+            self.setWindowTitle(self.tr("Leveler — %s") % os.path.basename(self.audio.path))
+            self._history = []
+            self._history_index = -1
+            self._save_history()
+
+        self._start(job, self.tr("Deleting selection…"), on_done)
 
     # ------------------------------------------------------------------ parameters
     def _refresh_profiles(self):
