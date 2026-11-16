@@ -202,8 +202,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.act_open = self._make_action(icon_path, "open.svg", "Open…", self.open_file, "Ctrl+O")
         self.toolbar.addAction(self.act_open)
-        self.act_prepare = self._make_action(icon_path, "export.svg", "Prepare correction", self.prepare_render)
-        self.toolbar.addAction(self.act_prepare)
+
+        # "Prepare correction" with hammer icon and text beside icon
+        self.act_prepare = self._make_action(icon_path, "prepare.svg", "Prepare correction", self.prepare_render)
+        btn_prepare = QtWidgets.QToolButton()
+        btn_prepare.setDefaultAction(self.act_prepare)
+        btn_prepare.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.toolbar.addWidget(btn_prepare)
         self.toolbar.addSeparator()
 
         self.act_play = self._make_action(icon_path, "play.svg", "Play", self.toggle_play)
