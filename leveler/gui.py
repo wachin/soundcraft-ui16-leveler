@@ -36,6 +36,7 @@ from .analysis import (
     detect_segments,
     export_corrected,
     predicted_peak_db,
+    Segment,
 )
 from .audiofile import AudioError, AudioFile, Cancelled
 from .profiles import ProfileManager
