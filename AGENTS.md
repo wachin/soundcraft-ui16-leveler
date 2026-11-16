@@ -24,7 +24,7 @@ read, and the result is written to a new WAV.
    Everything is processed in blocks (`mmap`, min/max pyramid, 4 M-frame chunks).
 4. **The source code, comments, docstrings and user-visible strings are written
    in English.** Spanish (and any other language) lives only in the translation
-   files under `nivelador/i18n/`.
+   files under `leveler/i18n/`.
 5. **Every user-visible string must go through `tr()`** (or
    `QCoreApplication.translate("context", ...)` outside a `QObject`). Never
    hardcode a string, and never write a translated literal in the source.
@@ -37,15 +37,15 @@ read, and the result is written to a new WAV.
 ## Layout
 
 ```
-nivelador/
+leveler/
 ├── __main__.py        # entry point: from .gui import main
 ├── gui.py             # Qt interface, worker thread, playback, drawing
 ├── analysis.py        # levels, statistics, gain curve, segments, limiter, render
 ├── audiofile.py       # block-wise WAV I/O (AudioFile, WavWriter, parse_riff)
 ├── translations.py    # language discovery/loading (.ts/.qm) — the i18n entry point
 └── i18n/
-    ├── nivelador_es.ts   # translation source, edited with Qt Linguist
-    └── nivelador_es.qm   # compiled, loaded at runtime
+    ├── leveler_es.ts   # translation source, edited with Qt Linguist
+    └── leveler_es.qm   # compiled, loaded at runtime
 ```
 
 ### `audiofile.py`
@@ -101,8 +101,8 @@ nivelador/
 
 ```bash
 # from the folder that contains the package
-python3 -m nivelador
-python3 -m nivelador "/path/to/service.wav"     # opens the file straight away
+python3 -m leveler
+python3 -m leveler "/path/to/service.wav"     # opens the file straight away
 ```
 
 On this machine the display is `:0.0`, the interpreter is `python3` (there is no
@@ -114,7 +114,7 @@ On this machine the display is `:0.0`, the interpreter is `python3` (there is no
 1. Byte-compile everything:
 
    ```bash
-   python3 -m py_compile nivelador/*.py
+   python3 -m py_compile leveler/*.py
    ```
 
 2. Headless functional check — builds a synthetic recording (10 s loud music +
@@ -123,10 +123,10 @@ On this machine the display is `:0.0`, the interpreter is `python3` (there is no
    ```python
    import os, sys, time, wave
    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-   sys.path.insert(0, "/path/to/repo")          # folder containing "nivelador"
+   sys.path.insert(0, "/path/to/repo")          # folder containing "leveler"
    import numpy as np
    from PyQt6 import QtWidgets
-   from nivelador.gui import MainWindow
+   from leveler.gui import MainWindow
 
    SR, path = 48000, "/tmp/test_niv.wav"
    t = np.arange(20 * SR) / SR
@@ -158,7 +158,7 @@ On this machine the display is `:0.0`, the interpreter is `python3` (there is no
 3. Real run (the interface must open and stay alive):
 
    ```bash
-   DISPLAY=:0.0 timeout 8 python3 -m nivelador
+   DISPLAY=:0.0 timeout 8 python3 -m leveler
    ```
 
 4. If you touched the analysis, confirm that the original file is untouched
@@ -168,9 +168,9 @@ On this machine the display is `:0.0`, the interpreter is `python3` (there is no
 ## Changing or adding texts (i18n)
 
 ```bash
-pylupdate6 nivelador/*.py -ts nivelador/i18n/nivelador_es.ts   # merge new texts
-linguist nivelador/i18n/nivelador_es.ts                        # review/translate
-lrelease nivelador/i18n/nivelador_es.ts                        # compile to .qm
+pylupdate6 leveler/*.py -ts leveler/i18n/leveler_es.ts   # merge new texts
+linguist leveler/i18n/leveler_es.ts                        # review/translate
+lrelease leveler/i18n/leveler_es.ts                        # compile to .qm
 ```
 
 - Contexts are the class name for `self.tr()` (`MainWindow`) and the string

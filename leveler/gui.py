@@ -121,7 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings = Settings()
         self.worker: Worker | None = None
         self.busy = False
-        self._tempdir = tempfile.mkdtemp(prefix="nivelador_")
+        self._tempdir = tempfile.mkdtemp(prefix="leveler_")
         self._render_path: str | None = None
         self._render_dirty = True
         self._span = 1.0
@@ -405,7 +405,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _retranslate(self):
         """Writes every visible text again in the currently installed language."""
-        self.setWindowTitle(self.tr("Nivelador — volume correction for console recordings"))
+        self.setWindowTitle(self.tr("Leveler — volume correction for console recordings"))
         self.mnu_lang.setTitle(self.tr("&Language"))
         self.toolbar.setWindowTitle(self.tr("Main"))
 
@@ -962,7 +962,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    app.setApplicationName("Nivelador")
+    app.setApplicationName("Leveler")
     translations.install(app, translations.preferred())
     win = MainWindow()
     win.show()

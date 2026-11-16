@@ -125,7 +125,7 @@ class AudioFile:
             raise AudioError(QCoreApplication.translate(
                 "audiofile",
                 "The format is not supported directly and 'ffmpeg' is not installed."))
-        self._tmpdir = tempfile.mkdtemp(prefix="nivelador_")
+        self._tmpdir = tempfile.mkdtemp(prefix="leveler_")
         out = os.path.join(self._tmpdir, "converted.wav")
         cmd = [
             "ffmpeg", "-v", "error", "-y", "-i", path,

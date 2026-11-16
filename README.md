@@ -71,7 +71,7 @@ cd soundcraft-ui16-leveler
 ## Run
 
 ```bash
-python3 -m nivelador
+python3 -m leveler
 ```
 
 ![](images/01-soundcraft-ui16-leveler.png)
@@ -82,31 +82,31 @@ python3 -m nivelador
 pip install PyQt6 pyqtgraph numpy
 ```
 
-The application is a Python package named `nivelador`, so it should live in a
+The application is a Python package named `leveler`, so it should live in a
 folder with that name inside the repository:
 
 ```
 soundcraft-ui16-leveler/
 ├── README.md
-└── nivelador/
+└── leveler/
     ├── __main__.py
     ├── gui.py
     ├── analysis.py
     ├── audiofile.py
     ├── translations.py
     └── i18n/
-        ├── nivelador_es.ts
-        └── nivelador_es.qm
+        ├── leveler_es.ts
+        └── leveler_es.qm
 ```
 
 ## Usage from pip
 
-Run it from the folder that contains the `nivelador` package:
+Run it from the folder that contains the `leveler` package:
 
 ```bash
-python3 -m nivelador
+python3 -m leveler
 # or open a recording straight away
-python3 -m nivelador "/path/to/service.wav"
+python3 -m leveler "/path/to/service.wav"
 ```
 
 1. **Open…** (`Ctrl+O`) and pick the recording. The file is analyzed while the
@@ -178,17 +178,17 @@ Uncovered by the interface, in `analysis.py` (`Settings`): analysis window
 ## Languages
 
 The source code is written in English and every visible string is wrapped in
-`tr()`. Translations live in `nivelador/i18n/` and are edited with Qt Linguist.
+`tr()`. Translations live in `leveler/i18n/` and are edited with Qt Linguist.
 
 ```bash
 # 1) Extract new or changed texts into the .ts file
-pylupdate6 nivelador/*.py -ts nivelador/i18n/nivelador_es.ts
+pylupdate6 leveler/*.py -ts leveler/i18n/leveler_es.ts
 
 # 2) Review and translate
-linguist nivelador/i18n/nivelador_es.ts
+linguist leveler/i18n/leveler_es.ts
 
 # 3) Compile it to a .qm (in Linguist: File > Release)
-lrelease nivelador/i18n/nivelador_es.ts
+lrelease leveler/i18n/leveler_es.ts
 ```
 
 A language appears in the **Language** menu as soon as its `.qm` file exists. The

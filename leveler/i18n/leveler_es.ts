@@ -4,7 +4,7 @@
     <name>MainWindow</name>
     <message>
       <location filename="../gui.py" line="408" />
-      <source>Nivelador — volume correction for console recordings</source>
+      <source>Leveler — volume correction for console recordings</source>
       <translation>Nivelador — corrección de volumen para grabaciones de consola</translation>
     </message>
     <message>
