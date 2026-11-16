@@ -1016,13 +1016,29 @@ class MainWindow(QtWidgets.QMainWindow):
         self.act_redo.setEnabled(self._history_index < len(self._history) - 1)
 
     def _undo(self):
-        if self._history_index <= 0 or self.res is None:
+        if self.res is None:
+            return
+        # If in selection mode, just clear the selection
+        if self._select_mode:
+            self._clear_selection()
+            self.act_select.setChecked(False)
+            self._toggle_select_mode(False)
+            return
+        if self._history_index <= 0:
             return
         self._history_index -= 1
         self._restore_history()
 
     def _redo(self):
-        if self._history_index >= len(self._history) - 1 or self.res is None:
+        if self.res is None:
+            return
+        # If in selection mode, just clear the selection
+        if self._select_mode:
+            self._clear_selection()
+            self.act_select.setChecked(False)
+            self._toggle_select_mode(False)
+            return
+        if self._history_index >= len(self._history) - 1:
             return
         self._history_index += 1
         self._restore_history()
