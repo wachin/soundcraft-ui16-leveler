@@ -196,14 +196,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setMovable(False)
         self.toolbar.setIconSize(QtCore.QSize(18, 18))
+        self.toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
 
-        self.act_open = self.toolbar.addAction("", self.open_file)
-        self.act_open.setShortcut("Ctrl+O")
-        self.act_prepare = self.toolbar.addAction("", self.prepare_render)
+        icon_path = os.path.join(os.path.dirname(__file__), "icons")
+
+        self.act_open = self._make_action(icon_path, "open.svg", "Open…", self.open_file, "Ctrl+O")
+        self.toolbar.addAction(self.act_open)
+        self.act_prepare = self._make_action(icon_path, "export.svg", "Prepare correction", self.prepare_render)
         self.toolbar.addSeparator()
 
-        self.act_play = self.toolbar.addAction("", self.toggle_play)
-        self.act_stop = self.toolbar.addAction("", self.stop_play)
+        self.act_play = self._make_action(icon_path, "play.svg", "Play", self.toggle_play)
+        self.act_stop = self._make_action(icon_path, "stop.svg", "Stop", self.stop_play)
         self.lbl_listen = QtWidgets.QLabel()
         self.toolbar.addWidget(self.lbl_listen)
         self.cmb_ab = QtWidgets.QComboBox()
@@ -213,18 +216,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar.addWidget(self.cmb_ab)
         self.toolbar.addSeparator()
 
-        self.act_zoom_in = self.toolbar.addAction("", lambda: self._zoom(0.5))
-        self.act_zoom_out = self.toolbar.addAction("", lambda: self._zoom(2.0))
-        self.act_fit = self.toolbar.addAction("", self.fit_view)
+        self.act_zoom_in = self._make_action(icon_path, "zoom_in.svg", "Zoom in", lambda: self._zoom(0.5))
+        self.act_zoom_out = self._make_action(icon_path, "zoom_out.svg", "Zoom out", lambda: self._zoom(2.0))
+        self.act_fit = self._make_action(icon_path, "fit.svg", "Fit all", self.fit_view)
         self.toolbar.addSeparator()
-        self.act_export = self.toolbar.addAction("", self.export_file)
-        self.act_export.setShortcut("Ctrl+E")
+        self.act_export = self._make_action(icon_path, "export.svg", "Export WAV…", self.export_file, "Ctrl+E")
 
         self.lbl_file = QtWidgets.QLabel()
         self.lbl_file.setStyleSheet("color:#8fa4c8;")
         self.toolbar.addSeparator()
         self.toolbar.addWidget(self.lbl_file)
         return self.toolbar
+
+    def _make_action(self, icon_path: str, icon_file: str, text: str, slot, shortcut: str = "") -> QtGui.QAction:
+        icon = QtGui.QIcon(os.path.join(icon_path, icon_file))
+        act = QtGui.QAction(icon, text, self)
+        act.triggered.connect(slot)
+        if shortcut:
+            act.setShortcut(shortcut)
+        act.setToolTip(text)
+        return act
 
     def _build_wave_area(self):
         box = QtWidgets.QWidget()
@@ -469,16 +480,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar.setWindowTitle(self.tr("Main"))
 
         self.act_open.setText(self.tr("Open…"))
+        self.act_open.setToolTip(self.tr("Open…"))
         self.act_prepare.setText(self.tr("Prepare correction"))
+        self.act_prepare.setToolTip(self.tr("Prepare correction"))
         playing = (getattr(self, "player", None) is not None
                    and self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState)
         self.act_play.setText(self.tr("Pause") if playing else self.tr("Play"))
+        self.act_play.setToolTip(self.tr("Pause") if playing else self.tr("Play"))
         self.act_stop.setText(self.tr("Stop"))
+        self.act_stop.setToolTip(self.tr("Stop"))
         self.lbl_listen.setText(self.tr("  Listen: "))
         self.act_zoom_in.setText(self.tr("Zoom in"))
+        self.act_zoom_in.setToolTip(self.tr("Zoom in"))
         self.act_zoom_out.setText(self.tr("Zoom out"))
+        self.act_zoom_out.setToolTip(self.tr("Zoom out"))
         self.act_fit.setText(self.tr("Fit all"))
+        self.act_fit.setToolTip(self.tr("Fit all"))
         self.act_export.setText(self.tr("Export WAV…"))
+        self.act_export.setToolTip(self.tr("Export WAV…"))
 
         idx = self.cmb_ab.currentIndex()
         self.cmb_ab.blockSignals(True)
