@@ -9,6 +9,7 @@
       <translation>Ganancia constante añadida a toda la grabación. Útil cuando el nivel de referencia es muy bajo o para grabaciones solo de voz.</translation>
     </message>
     <message>
+      <location filename="../gui.py" line="659" />
       <location filename="../gui.py" line="464" />
       <source>Leveler — %s</source>
       <translation>Nivelador — %s</translation>
@@ -39,18 +40,18 @@
       <translation>Preparar corrección</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1048" />
-      <location filename="../gui.py" line="1014" />
-      <location filename="../gui.py" line="1000" />
-      <location filename="../gui.py" line="987" />
+      <location filename="../gui.py" line="1049" />
+      <location filename="../gui.py" line="1015" />
+      <location filename="../gui.py" line="1001" />
+      <location filename="../gui.py" line="988" />
       <location filename="../gui.py" line="474" />
       <source>Pause</source>
       <translation>Pausar</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1062" />
-      <location filename="../gui.py" line="1020" />
-      <location filename="../gui.py" line="1008" />
+      <location filename="../gui.py" line="1063" />
+      <location filename="../gui.py" line="1021" />
+      <location filename="../gui.py" line="1009" />
       <location filename="../gui.py" line="474" />
       <source>Play</source>
       <translation>Reproducir</translation>
@@ -287,92 +288,92 @@
       <translation>Analizando «%s»…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="668" />
+      <location filename="../gui.py" line="669" />
       <source>Ready: %s. Click on the waveform to play from that point.</source>
       <translation>Listo: %s. Haga clic sobre la onda para reproducir desde ese punto.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="900" />
+      <location filename="../gui.py" line="901" />
       <source>Profile saved: %s</source>
       <translation>Perfil guardado: %s</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="907" />
+      <location filename="../gui.py" line="908" />
       <source>Delete profile</source>
       <translation>Eliminar perfil</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="908" />
+      <location filename="../gui.py" line="909" />
       <source>Are you sure you want to delete the profile “%s”?</source>
       <translation>¿Está seguro de que desea eliminar el perfil «%s»?</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="912" />
+      <location filename="../gui.py" line="913" />
       <source>Profile deleted: %s</source>
       <translation>Perfil eliminado: %s</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="948" />
+      <location filename="../gui.py" line="949" />
       <source>%+.1f dB  →  voice at %.1f dBFS</source>
       <translation>%+.1f dB  →  voz a %.1f dBFS</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1001" />
+      <location filename="../gui.py" line="1002" />
       <source>Playing from %s</source>
       <translation>Reproduciendo desde %s</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1027" />
+      <location filename="../gui.py" line="1028" />
       <source>The correction is not ready yet; use “Prepare correction”.</source>
       <translation>Aún no está preparada la corrección; use «Preparar corrección».</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1039" />
+      <location filename="../gui.py" line="1040" />
       <source>Press “Prepare correction” before listening to the corrected version.</source>
       <translation>Pulse «Preparar corrección» antes de escuchar la versión corregida.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1066" />
+      <location filename="../gui.py" line="1067" />
       <source>Player: </source>
       <translation>Reproductor: </translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1076" />
+      <location filename="../gui.py" line="1077" />
       <source>Rendering preview…</source>
       <translation>Generando vista previa…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1082" />
+      <location filename="../gui.py" line="1083" />
       <source>Preparing the corrected version for listening…</source>
       <translation>Preparando la versión corregida para escuchar…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1086" />
+      <location filename="../gui.py" line="1087" />
       <source>Correction ready. Choose “Corrected” to listen to the A/B comparison.</source>
       <translation>Corrección preparada. Elija «Corregido» para escuchar la comparación A/B.</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1097" />
+      <location filename="../gui.py" line="1098" />
       <source>Save corrected audio</source>
       <translation>Guardar audio corregido</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1097" />
+      <location filename="../gui.py" line="1098" />
       <source>WAV (*.wav)</source>
       <translation>WAV (*.wav)</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1103" />
+      <location filename="../gui.py" line="1104" />
       <source>Exporting audio…</source>
       <translation>Exportando audio…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1107" />
+      <location filename="../gui.py" line="1108" />
       <source>Exporting “%s”…</source>
       <translation>Exportando «%s»…</translation>
     </message>
     <message>
-      <location filename="../gui.py" line="1109" />
+      <location filename="../gui.py" line="1110" />
       <source>Exported: %s (the original file was not modified).</source>
       <translation>Exportado: %s (el archivo original no fue modificado).</translation>
     </message>

@@ -26,7 +26,7 @@ class Settings:
     ref_manual_db: float | None = None
     target_db: float = 0.0            # target (voice) level in dB relative to the music
     global_boost_db: float = 0.0      # constant boost applied to the whole file
-    max_gain_db: float = 24.0
+    max_gain_db: float = 48.0
     allow_attenuate: bool = False
     max_atten_db: float = 6.0
     content_floor_db: float = 30.0    # do not amplify what is X dB below the reference

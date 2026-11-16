@@ -656,6 +656,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _after_open(self):
         if self.audio is None:
             return
+        self.setWindowTitle(self.tr("Leveler — %s") % os.path.basename(self.audio.path))
         self.lbl_file.setText("  " + os.path.basename(self.audio.path) + " ")
         self._bind_audio()
         self._refresh_seg_table()
