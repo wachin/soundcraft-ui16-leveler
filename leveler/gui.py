@@ -196,7 +196,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setMovable(False)
         self.toolbar.setIconSize(QtCore.QSize(18, 18))
-        self.toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
 
         icon_path = os.path.join(os.path.dirname(__file__), "icons")
 
